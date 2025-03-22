@@ -8,10 +8,10 @@ public interface UserService {
 
   void validateUser(String token) throws UserException;
 
-  User findUserByCreator(String creator) throws UserException;
-
   boolean followUser(String creatorId, String followerId) throws UserException;
 
   User getMyProfile(String token) throws UserException;
+
+  User getUserProfile(String userId) throws UserException;
 
 }

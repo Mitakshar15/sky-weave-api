@@ -39,12 +39,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User findUserByCreator(String creator) throws UserException {
-    return userRepository.findById(creator).orElseThrow(
-        () -> new UserException(Constants.DATA_NOT_FOUND_KEY, Constants.USER_NOT_FOUND_MESSAGE));
-  }
-
-  @Override
   public boolean followUser(String creatorId, String followerId) throws UserException {
     User creator = userRepository.findById(creatorId).orElseThrow(
         () -> new UserException(Constants.DATA_NOT_FOUND_KEY, Constants.USER_NOT_FOUND_MESSAGE));
@@ -69,6 +63,11 @@ public class UserServiceImpl implements UserService {
       throw new UserException(Constants.DATA_NOT_FOUND_KEY, Constants.USER_NOT_FOUND_MESSAGE);
     }
     return user;
+  }
+
+  @Override
+  public User getUserProfile(String userId) throws UserException {
+      return userRepository.findById(userId).orElseThrow(()->new UserException(Constants.DATA_NOT_FOUND_KEY,Constants.USER_NOT_FOUND_MESSAGE));
   }
 
 

@@ -39,4 +39,11 @@ public class UserController implements UserMgmtV1Api {
     response.data(builder.buildUserProfileData(userService.getMyProfile(authorization)));
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
+
+  @Override
+  public ResponseEntity<UserProfileResponse> getUserProfile(String authorization, String userId) throws Exception {
+    UserProfileResponse response = mapper.toUserProfileResponse(builder.buildSuccessApiResponse(Constants.USER_PROFILE_FETCH_SUCCESS_MESSAGE));
+    response.data(builder.buildUserProfileData(userService.getUserProfile(userId)));
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 }
