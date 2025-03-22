@@ -1,0 +1,242 @@
+components:
+  schemas:
+    # ************************ Common Api Responses ******************
+    BaseApiResponse:
+      type: object
+      discriminator:
+        propertyName: respType
+
+    DigitalWorkServiceBaseApiResponse:
+      type: object
+      properties:
+      allOf:
+        - $ref: '#/components/schemas/BaseApiResponse'
+    # ************************ Digital Service Api Responses ******************
+
+    CreateProductResponse:
+      type: object
+      properties:
+      allOf:
+        - $ref: "#/components/schemas/BaseApiResponse"
+
+
+    DigitalWorkResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: "#/components/schemas/DigitalWorkDto"
+      allOf:
+        - $ref: "#/components/schemas/BaseApiResponse"
+
+    PurchaseProductResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: "#/components/schemas/PurchaseProductData"
+      allOf:
+        - $ref: "#/components/schemas/DigitalWorkServiceBaseApiResponse"
+
+    PaymentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: "#/components/schemas/PaymentData"
+      allOf:
+        - $ref: "#/components/schemas/DigitalWorkServiceBaseApiResponse"
+
+
+
+    # ************************ Digital Service Api Requests ******************
+    CreateProductRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the digital work
+          example: "My Awesome Artwork"
+        description:
+          type: string
+          description: Description of the digital work
+        creator:
+          type: string
+          description: ID of the creator (obtained from User Management service)
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/DigitalWorkFileDto'
+          description: List of files associated with the digital work
+        thumbnailUrl:
+          type: string
+          description: URL of the thumbnail image
+        price:
+          type: integer
+          format: int64
+          description: Price of the digital work (in cents)
+        isFree:
+          type: boolean
+          description: Whether the digital work is free
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagDto'
+          description: List of tags associated with the digital work
+        category:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            parentCategory:
+              type: string
+        status:
+          type: string
+          enum: [ DRAFT, PUBLISHED, UNDER_REVIEW, REJECTED, ARCHIVED ]
+          description: Status of the digital work
+        previewImages:
+          type: array
+          items:
+            type: string
+          description: List of preview image URLs
+        license:
+          type: string
+          description: License information for the digital work
+
+    SaveDigitalWorkRequest:
+      type: object
+      required:
+        - digitalWorkId
+        - status
+        - saveType
+      properties:
+        digitalWorkId:
+          type: string
+        status:
+          type: string
+        saveType:
+          type: string
+          enum: [ WISHLIST, INSPIRATION, BOOKMARK ]
+          description: Status of the digital work
+
+    PurchaseRequest:
+      type: object
+      properties:
+        digitalWorkId:
+          type: string
+
+    PaymentRequest:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+          enum: [ CARD, CASH, UPI, DEBIT, EMI ]
+        purchaseId:
+          type: string
+
+    # ************************ Digital Service Api Dtos ******************
+    DigitalWorkFileDto:
+      type: object
+      properties:
+        fileUrl:
+          type: string
+          description: URL of the file
+        fileType:
+          type: string
+          description: MIME type of the file (e.g., image/jpeg)
+        fileSize:
+          type: integer
+          format: int64
+          description: Size of the file in bytes
+
+    TagDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the tag
+
+    CategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the category
+        description:
+          type: string
+          description: Description of the category
+        parentCategory:
+          type: string
+
+
+    DigitalWorkDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the digital work
+        description:
+          type: string
+          description: Description of the digital work
+        creator:
+          type: string
+          description: ID or username of the creator
+        thumbnailUrl:
+          type: string
+          description: URL of the thumbnail image
+        price:
+          type: integer
+          format: int64
+          description: Price of the digital work (in cents, or smallest currency unit)
+        isFree:
+          type: boolean
+          description: Whether the digital work is free
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          $ref: '#/components/schemas/CategoryDto'
+        status:
+          type: string
+          enum: [ DRAFT, PUBLISHED, UNDER_REVIEW, REJECTED, ARCHIVED ]
+          description: Status of the digital work
+        downloads:
+          type: integer
+          description: Number of downloads
+        likes:
+          type: integer
+          description: Number of likes
+        views:
+          type: integer
+          description: Number of views
+        saved:
+          type: boolean
+          description: is the product saved or not
+
+    PurchaseProductData:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        purchaseId:
+          type: string
+        buyer:
+          type: string
+        purchaseStatus:
+          type: string
+          enum: [COMPLETED, PENDING, FAILED]
+        purchasePrice:
+          type: long
+        digitalProductId:
+          type: string
+
+    PaymentData:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string

@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: Digi-Mart Service - OpenAPI 3.0
+  description: |-
+    Digi Mart Service API Spec
+  version: 0.0.1
+  contact:
+    name: API Support
+    email: work.mitakshar@gmail.com
+servers:
+  - url: api
+tags:
+  - name: digital work service v1
+    description: Digital Work Service (Product Management) endpoints version 1
+paths:
+
+  /v1/product/create:
+    post:
+      tags:
+        - digital product mgmt v1
+      summary: Create new Digital work
+      description: Create new Digital work
+      operationId: createDigitalWork
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: Create Product Request
+        content:
+          application/json:
+            schema:
+              $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/CreateProductRequest'
+        required: true
+      responses:
+        '201':
+          description: "Create Product Success Success"
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/CreateProductResponse'
+        '422':
+          description: "Create Product Request is valid but the service was not able to process it ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '400':
+          description: "Validations failed for request arguments ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+
+
+  /v1/product/{productId}:
+    get:
+      tags:
+        - digital product mgmt v1
+      summary: Create new Digital work
+      description: Create new Digital work
+      operationId: getDigitalWorkById
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+        - name: "productId"
+          in : "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '201':
+          description: "Create Product Success Success"
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkResponse'
+        '422':
+          description: "Get Product Request is valid but the service was not able to process it ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '400':
+          description: "Validations failed for request arguments ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+
+  /v1/product/purchase:
+    post:
+      tags:
+        - purchase mgmt v1
+      summary: Purchase Digital Work
+      description: Purchase a Digital work
+      operationId: purchaseDigitalWork
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: Purchase Product Request
+        content:
+          application/json:
+            schema:
+              $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/PurchaseRequest'
+        required: true
+      responses:
+        '201':
+          description: "Purchase Product Success Success"
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/PurchaseProductResponse'
+        '500':
+          description: "Purchase Product Request is valid but the service was not able to process it ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '400':
+          description: "Validations failed for request arguments ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+
+  /v1/product/save:
+    post:
+      tags:
+        - digital product mgmt v1
+      summary: Create new Digital work
+      description: Create new Digital work
+      operationId: saveDigitalWork
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: Create Product Request
+        content:
+          application/json:
+            schema:
+              $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/SaveDigitalWorkRequest'
+        required: true
+      responses:
+        '201':
+          description: "Save Product Success Success"
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '422':
+          description: "Save Product Request is valid but the service was not able to process it ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '400':
+          description: "Validations failed for request arguments ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+
+  /v1/product/purchase/payment:
+    put:
+      tags:
+        - purchase mgmt v1
+      summary: Purchase Digital Work
+      description: Purchase a Digital work
+      operationId: confirmPurchase
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: Purchase Product Request
+        content:
+          application/json:
+            schema:
+              $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/PaymentRequest'
+        required: true
+      responses:
+        '200':
+          description: "Purchase Product Payment Success"
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/PaymentResponse'
+        '500':
+          description: "Purchase Product Payment Request is valid but the service was not able to process it ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
+        '400':
+          description: "Validations failed for request arguments ..."
+          content:
+            application/json:
+              schema:
+                $ref: './DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkServiceBaseApiResponse'
