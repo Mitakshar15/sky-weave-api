@@ -26,7 +26,7 @@ public class UserController implements UserMgmtV1Api {
   public ResponseEntity<UserMgmtBaseApiResponse> followUser(String authorization, String creatorId)
       throws Exception {
     User user = userService.findUserByToken(authorization);
-    userService.followUser(user.getUserId(), creatorId);
+    userService.followUser(creatorId, user.getUserId());
     UserMgmtBaseApiResponse response = mapper.toUserMgmtBaseApiResponse(
         builder.buildSuccessApiResponse(Constants.FOLLOW_USER_SUCCESS_MESSAGE));
     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -41,9 +41,12 @@ public class UserController implements UserMgmtV1Api {
   }
 
   @Override
-  public ResponseEntity<UserProfileResponse> getUserProfile(String authorization, String userId) throws Exception {
-    UserProfileResponse response = mapper.toUserProfileResponse(builder.buildSuccessApiResponse(Constants.USER_PROFILE_FETCH_SUCCESS_MESSAGE));
-    response.data(builder.buildUserProfileData(userService.getUserProfile(userId)));
+  public ResponseEntity<UserProfileResponse> getUserProfile(String authorization, String userId)
+      throws Exception {
+    User myProfile = userService.findUserByToken(authorization);
+    UserProfileResponse response = mapper.toUserProfileResponse(
+        builder.buildSuccessApiResponse(Constants.USER_PROFILE_FETCH_SUCCESS_MESSAGE));
+    response.data(builder.buildUserProfileData(myProfile, userService.getUserProfile(userId)));
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

@@ -1,6 +1,11 @@
 package org.skyweave.service.api.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -12,13 +17,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.*;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
   @Value("${spring.data.redis.host}")
   private String redisHost;
@@ -26,32 +31,38 @@ public class RedisConfig {
   @Value("${spring.data.redis.port}")
   private int redisPort;
 
-  @Bean
-  public LettuceConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
-  }
+  private final LettuceConnectionFactory redisConnectionFactory;
 
+  // @Bean
+  // RedisTemplate<String, Object> redisTemplate() {
+  // final RedisTemplate<String, Object> template = new RedisTemplate<>();
+  // template.setConnectionFactory(redisConnectionFactory);
+  // template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
+  // return template;
+  // }
   @Bean
-  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+  public RedisTemplate<String, Object> redisTemplate() {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
-    template.setConnectionFactory(connectionFactory);
+    template.setConnectionFactory(redisConnectionFactory);
 
-    // Configure serializers
+    ObjectMapper objectMapper = objectMapper();
+    GenericJackson2JsonRedisSerializer serializer =
+        new GenericJackson2JsonRedisSerializer(objectMapper);
+
     template.setKeySerializer(new StringRedisSerializer());
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+    template.setValueSerializer(serializer);
     template.setHashKeySerializer(new StringRedisSerializer());
-    template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+    template.setHashValueSerializer(serializer);
+    template.afterPropertiesSet();
 
     return template;
   }
 
   @Bean
-  public CacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
-    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-        .entryTtl(Duration.ofHours(1))
-        .serializeValuesWith(SerializationPair.fromSerializer(redisTemplate.getValueSerializer()));
-
-    return RedisCacheManager.builder(redisTemplate.getConnectionFactory()).cacheDefaults(config)
-        .build();
+  public ObjectMapper objectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule()); // Support Java 8 date/time types
+    return mapper;
   }
+
 }

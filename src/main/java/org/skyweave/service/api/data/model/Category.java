@@ -1,5 +1,6 @@
 package org.skyweave.service.api.data.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,10 +38,12 @@ public class Category {
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
   @Builder.Default
+  @JsonIgnore
   private List<Category> children = new ArrayList<>();
 
   @OneToMany(mappedBy = "category")
   @Builder.Default
+  @JsonIgnore
   private List<DigitalWork> digitalWorks = new ArrayList<>();
 
   public void addChild(Category child) {

@@ -16,6 +16,7 @@ import org.skyweave.service.api.utils.Constants;
 import org.skyweave.service.api.utils.DigitalWorkUtils;
 import org.skyweave.service.api.utils.enums.PaymentStatus;
 import org.skyweave.service.api.utils.enums.PurchaseStatus;
+import org.skyweave.service.dto.PaymentRequest;
 import org.skyweave.service.dto.PurchaseProductData;
 import org.skyweave.service.dto.PurchaseRequest;
 import org.springframework.stereotype.Service;
@@ -49,13 +50,14 @@ public class PurchaseServiceImpl implements PurchaseService {
   }
 
   @Override
-  public Purchases confirmPurchase(User user, String purchaseId)
+  public Purchases confirmPurchase(User user, PaymentRequest request)
       throws ProductException, PurchaseException {
 
-    Purchases purchases = purchaseRepository.findById(purchaseId)
+    Purchases purchases = purchaseRepository.findById(request.getPurchaseId())
         .orElseThrow(() -> new ProductException(Constants.DATA_NOT_FOUND_KEY,
             Constants.PURCHASE_DETAILS_NOT_FOUND_MESSAGE));
-    PaymentDetails details = digitalWorkUtils.handlePayment(purchases);
+    PaymentDetails details =
+        digitalWorkUtils.handlePayment(purchases, request.getBillingAddress(), user);
     boolean isPaid = true;
     if (!isPaid) {
       purchases.setPurchaseStatus(PurchaseStatus.FAILED);

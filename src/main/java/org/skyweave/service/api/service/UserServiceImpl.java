@@ -17,7 +17,6 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
-  @Cacheable(value = "users", key = "#id")
   public User findUserByToken(String token) throws UserException {
     String email = jwtProvider.getEmailFromJwtToken(token);
     User user = userRepository.findByEmail(email);
@@ -28,7 +27,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Cacheable(value = "users", key = "#id")
   public void validateUser(String token) throws UserException {
     try {
       User user = findUserByToken(token);
@@ -67,7 +65,8 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User getUserProfile(String userId) throws UserException {
-      return userRepository.findById(userId).orElseThrow(()->new UserException(Constants.DATA_NOT_FOUND_KEY,Constants.USER_NOT_FOUND_MESSAGE));
+    return userRepository.findById(userId).orElseThrow(
+        () -> new UserException(Constants.DATA_NOT_FOUND_KEY, Constants.USER_NOT_FOUND_MESSAGE));
   }
 
 

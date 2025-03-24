@@ -121,30 +121,6 @@ components:
         jwt:
           type: string
 
-#    UserProfileDto:
-#      type: object
-#      properties:
-#        userId:
-#          type: string
-#        email:
-#          type: string
-#        firstName:
-#          type: string
-#        lastName:
-#          type: string
-#        phoneNumber:
-#          type: string
-#        dateOfBirth:
-#          type: date
-#        gender:
-#          type: string
-#        profilePicture:
-#          type: string
-#        isEmailVerified:
-#          type: boolean
-#        isActive:
-#          type: boolean
-
     UserProfileDTO:
       type: object
       properties:
@@ -217,6 +193,8 @@ components:
           type: array
           items:
             $ref: "DigitalWorkServiceApiComponents.yaml#/components/schemas/DigitalWorkDto"
+        isFollowing:
+          type: boolean
       required:
         - userId
         - email

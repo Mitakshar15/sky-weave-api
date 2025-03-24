@@ -7,7 +7,10 @@ import org.skyweave.service.api.data.model.User;
 import org.skyweave.service.api.exception.ProductException;
 import org.skyweave.service.api.exception.UserException;
 import org.skyweave.service.dto.CreateProductRequest;
+import org.skyweave.service.dto.PaginatedDigitalWorkDTO;
 import org.skyweave.service.dto.SaveDigitalWorkRequest;
+
+import java.util.List;
 
 public interface DigitalWorkService {
 
@@ -17,5 +20,8 @@ public interface DigitalWorkService {
 
   SavedWorks saveDigitalWork(@Valid SaveDigitalWorkRequest request, String authorization)
       throws ProductException, UserException;
+
+  public PaginatedDigitalWorkDTO getUserFeed(String userId, Integer page, Integer size,
+      String categoryId, List<String> tagIds, String sort) throws ProductException, UserException;
 
 }

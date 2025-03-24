@@ -1,5 +1,7 @@
 package org.skyweave.service.api.data.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.skyweave.service.api.utils.enums.Gender;
@@ -55,6 +57,7 @@ public class User {
 
   @Column(name = "created_at")
   @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
 
   @ElementCollection
@@ -64,6 +67,7 @@ public class User {
 
   @Column(name = "updated_at")
   @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime updatedAt;
 
   @ElementCollection

@@ -17,6 +17,12 @@ public class Address {
   @Column(name = "address_id")
   private String addressId;
 
+  @Column(name = "address_line_1")
+  private String addressLine1;
+
+  @Column(name = "address_line_2")
+  private String addressLine2;
+
   @Column(name = "street")
   private String street;
 

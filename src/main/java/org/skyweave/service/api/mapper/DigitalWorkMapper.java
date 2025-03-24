@@ -9,6 +9,7 @@ import org.mapstruct.Qualifier;
 import org.skyweave.service.api.config.apiconfig.BaseApiResponse;
 import org.skyweave.service.api.data.model.*;
 import org.skyweave.service.dto.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -55,4 +56,10 @@ public interface DigitalWorkMapper {
 
 
   UserProfileDTO toUserProfileDto(User myProfile);
+
+  FeedResponse toFeedResponse(BaseApiResponse baseApiResponse);
+
+  PaginatedDigitalWorkDTO toPaginatedDTO(Page<DigitalWork> digitalWorksPage);
+
+  Address toAddressEntity(AddressDto addressDto);
 }

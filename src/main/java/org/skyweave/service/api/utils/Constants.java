@@ -29,6 +29,11 @@ public class Constants {
   public static final String USER_NOT_FOUND_MESSAGE = "user not found";
   public static final String FOLLOW_USER_SUCCESS_MESSAGE = "follow user successful";
   public static final String FAILED_TO_FOLLOW_MESSAGE = "failed to follow user";
+  public static final String USER_PROFILE_FETCH_SUCCESS_MESSAGE =
+      "user profile fetched successfully";
+  public static final String GET_FEED_SUCCESS_MESSAGE = "get feed successful";
+
+
   // Api Constants
   public static final String DATA_NOT_FOUND_KEY = "data_not_found";
   public static final String REQUEST_ERROR_KEY = "request_error";
@@ -42,6 +47,5 @@ public class Constants {
   public static final String SERVICE_ERROR_MESSAGE = "service error";
 
 
-  public static final String USER_PROFILE_FETCH_SUCCESS_MESSAGE =
-      "user profile fetched successfully";
+
 }

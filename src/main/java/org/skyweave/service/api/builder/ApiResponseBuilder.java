@@ -8,6 +8,7 @@ import org.skyweave.service.api.config.apiconfig.Metadata;
 import org.skyweave.service.api.config.apiconfig.Status;
 import org.skyweave.service.api.config.jwt.JwtProvider;
 import org.skyweave.service.api.data.SavedWorkRepository;
+import org.skyweave.service.api.data.UserRepository;
 import org.skyweave.service.api.data.model.DigitalWork;
 import org.skyweave.service.api.data.model.Purchases;
 import org.skyweave.service.api.data.model.User;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -33,6 +35,7 @@ public class ApiResponseBuilder {
   private final JwtProvider jwtProvider;
   private final DigitalWorkMapper mapper;
   private final SavedWorkRepository savedWorkRepository;
+  private final UserRepository userRepository;
 
   public BaseApiResponse buildSuccessApiResponse(String statusMessage) {
     BaseApiResponse response = new BaseApiResponse()
@@ -69,6 +72,17 @@ public class ApiResponseBuilder {
     UserProfileDTO userProfileDTO = mapper.toUserProfileDto(myProfile);
     userProfileDTO.setFollowersCount(myProfile.getFollowers().size());
     userProfileDTO.setFollowingCount(myProfile.getFollowing().size());
+    return userProfileDTO;
+  }
+
+  public UserProfileDTO buildUserProfileData(User myProfile, User creatorProfile) {
+    UserProfileDTO userProfileDTO = mapper.toUserProfileDto(creatorProfile);
+    userProfileDTO.setFollowersCount(creatorProfile.getFollowers().size());
+    userProfileDTO.setFollowingCount(creatorProfile.getFollowing().size());
+    List<String> followers = creatorProfile.getFollowers();
+    if (followers.contains(myProfile.getUserId())) {
+      userProfileDTO.setIsFollowing(true);
+    }
     return userProfileDTO;
   }
 }

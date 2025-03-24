@@ -42,8 +42,7 @@ public class PurchaseController implements PurchaseMgmtV1Api {
     User user = userService.findUserByToken(authorization);
     PaymentResponse response = mapper
         .toPaymentResponse(builder.buildSuccessApiResponse(Constants.PAYMENT_SUCCESFULL_MESSAGE));
-    response.data(builder
-        .buildPurchaseData(purchaseService.confirmPurchase(user, paymentRequest.getPurchaseId())));
+    response.data(builder.buildPurchaseData(purchaseService.confirmPurchase(user, paymentRequest)));
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

@@ -3,16 +3,20 @@ package org.skyweave.service.api.utils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.skyweave.service.api.data.AddressRepository;
 import org.skyweave.service.api.data.CategoryRepository;
 import org.skyweave.service.api.data.TagRepository;
+import org.skyweave.service.api.data.UserRepository;
 import org.skyweave.service.api.data.model.*;
 import org.skyweave.service.api.exception.ProductException;
 import org.skyweave.service.api.mapper.DigitalWorkMapper;
 import org.skyweave.service.api.utils.enums.PaymentMethod;
 import org.skyweave.service.api.utils.enums.PaymentStatus;
+import org.skyweave.service.dto.AddressDto;
 import org.skyweave.service.dto.CreateProductRequestCategory;
 import org.skyweave.service.dto.DigitalWorkFileDto;
 import org.skyweave.service.dto.TagDto;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,6 +32,8 @@ public class DigitalWorkUtils {
   private final CategoryRepository categoryRepository;
   private final DigitalWorkMapper mapper;
   private final TagRepository tagRepository;
+  private final AddressRepository addressRepository;
+  private final UserRepository userRepository;
 
 
   public List<Tag> getOrCreateTags(@Valid List<@Valid TagDto> tags, DigitalWork digitalWork) {
@@ -79,13 +85,34 @@ public class DigitalWorkUtils {
   }
 
 
-  public PaymentDetails handlePayment(Purchases purchases) {
+  public PaymentDetails handlePayment(Purchases purchases, AddressDto addressDto, User user) {
     PaymentDetails details = new PaymentDetails();
+    Address address = mapper.toAddressEntity(addressDto);
+    address.setUser(user);
+    address = addressRepository.save(address);
+    user.getAddress().add(address);
+    userRepository.save(user);
     details.setPaymentMethod(PaymentMethod.UPI);
     details.setRazorpayPaymentId(UUID.randomUUID().toString());
     details.setRazorpayPaymentLinkStatus("APPROVED");
     details.setRazorpayPaymentLinkStatus("APPROVED");
     details.setPaymentStatus(PaymentStatus.COMPLETED);
     return details;
+  }
+
+  public Sort parseSort(String sort) {
+    try {
+      String[] parts = sort.split(",");
+      String field = parts[0].trim();
+      Sort.Direction direction =
+          parts.length > 1 && "asc".equalsIgnoreCase(parts[1].trim()) ? Sort.Direction.ASC
+              : Sort.Direction.DESC;
+      if ("createdAt".equals(field) || "price".equals(field) || "likes".equals(field)
+          || "views".equals(field)) {
+        return Sort.by(direction, field);
+      }
+    } catch (Exception ignored) {
+    }
+    return Sort.by(Sort.Direction.DESC, "createdAt"); // Default
   }
 }

@@ -48,6 +48,14 @@ components:
         - $ref: "#/components/schemas/DigitalWorkServiceBaseApiResponse"
 
 
+    FeedResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: "#/components/schemas/PaginatedDigitalWorkDTO"
+      allOf:
+        - $ref: "#/components/schemas/DigitalWorkServiceBaseApiResponse"
 
     # ************************ Digital Service Api Requests ******************
     CreateProductRequest:
@@ -135,6 +143,9 @@ components:
           enum: [ CARD, CASH, UPI, DEBIT, EMI ]
         purchaseId:
           type: string
+        billingAddress:
+          type: object
+          $ref: "#/components/schemas/AddressDto"
 
     # ************************ Digital Service Api Dtos ******************
     DigitalWorkFileDto:
@@ -215,6 +226,9 @@ components:
         saved:
           type: boolean
           description: is the product saved or not
+        createdAt:
+          type: string
+          format: local-date-time
 
     PurchaseProductData:
       type: object
@@ -240,3 +254,98 @@ components:
           type: string
         status:
           type: string
+
+
+    PaginatedDigitalWorkDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/DigitalWorkDto'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+        first:
+          type: boolean
+        empty:
+          type: boolean
+      required:
+        - content
+        - pageable
+        - totalPages
+        - totalElements
+
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        sort:
+          type: object
+          properties:
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+            empty:
+              type: boolean
+
+    AddressDto:
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          description: Address Line 1
+          example: "cambridge university"
+        addressLine2:
+          type: string
+          description: Address Line 2
+          example: "example line 2"
+        street:
+          type: string
+          description: Street
+          minLength: 2
+          maxLength: 100
+          example: "123 Main St"
+        city:
+          type: string
+          description: City name
+          minLength: 2
+          maxLength: 50
+          example: "New York"
+        state:
+          type: string
+          description: State or province
+          minLength: 2
+          maxLength: 50
+          example: "NY"
+        country:
+          type: string
+          description: Country name
+          minLength: 2
+          maxLength: 50
+          example: "United States"
+        zipCode:
+          type: string
+          description: Zip or Postal Code
+          pattern: "^[0-9]{5}(-[0-9]{4})?$"
+          example: "10001"
+      required:
+        - addressLine1
+        - street
+        - city
+        - state
+        - country
+        - zipCode
+        -

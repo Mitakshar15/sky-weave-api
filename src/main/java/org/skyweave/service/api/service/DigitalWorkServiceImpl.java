@@ -2,42 +2,40 @@ package org.skyweave.service.api.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.skyweave.service.api.config.RedisService;
 import org.skyweave.service.api.data.*;
 import org.skyweave.service.api.data.model.*;
+import org.skyweave.service.api.data.redis.IRedisCacheRepository;
+import org.skyweave.service.api.data.redis.RedisCacheRepositoryImpl;
 import org.skyweave.service.api.exception.ProductException;
 import org.skyweave.service.api.exception.UserException;
 import org.skyweave.service.api.mapper.DigitalWorkMapper;
 import org.skyweave.service.api.utils.Constants;
 import org.skyweave.service.api.utils.DigitalWorkUtils;
 import org.skyweave.service.api.utils.enums.SaveType;
-import org.skyweave.service.api.utils.enums.SavedWorkStatus;
 import org.skyweave.service.dto.*;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class DigitalWorkServiceImpl implements DigitalWorkService {
 
-  private final DigitalWorkRepository repository;
   private final DigitalWorkMapper mapper;
-  private final CategoryRepository categoryRepository;
-  private final TagRepository tagRepository;
   private final UserService userService;
   private final DigitalWorkRepository digitalWorkRepository;
-  private final DigitalWorkFileRepository digitalWorkFileRepository;
   private final DigitalWorkUtils digitalWorkUtils;
   private final SavedWorkRepository savedWorkRepository;
   private final UserRepository userRepository;
-
+  private final IRedisCacheRepository<PaginatedDigitalWorkDTO> digitalWorkCacheRepository;
 
   @Override
   @Transactional
@@ -62,7 +60,6 @@ public class DigitalWorkServiceImpl implements DigitalWorkService {
   }
 
   @Override
-  @Cacheable(value = "digitalWorks", key = "#digitalWorkId", unless = "#result == null")
   public DigitalWork getDigitalWork(String digitalWorkId) throws ProductException {
     Optional<DigitalWork> opt = digitalWorkRepository.findById(digitalWorkId);
     if (opt.isPresent()) {
@@ -93,6 +90,35 @@ public class DigitalWorkServiceImpl implements DigitalWorkService {
     user.getSavedWorks().add(savedWorks);
     userRepository.save(user);
     return savedWorks;
+  }
+
+  @Override
+  public PaginatedDigitalWorkDTO getUserFeed(String userId, Integer page, Integer size,
+      String categoryId, List<String> tags, String sort) throws ProductException, UserException {
+
+    PaginatedDigitalWorkDTO dto = digitalWorkCacheRepository.findByKey("digital work of " + userId + " "+ page);
+    if (dto == null) {
+
+      User user = userRepository.findById(userId).orElseThrow(
+          () -> new UserException(Constants.DATA_NOT_FOUND_KEY, Constants.USER_NOT_FOUND_MESSAGE));
+      List<String> followingIds = user.getFollowing();
+      int pageNum = page != null && page >= 0 ? page : 0;
+      int pageSize = size != null && size > 0 && size <= 100 ? size : 20;
+      List<String> filteredTags = (tags != null && !tags.isEmpty()) ? tags : null;
+
+      Sort sortOrder = sort != null ? digitalWorkUtils.parseSort(sort)
+          : Sort.by(Sort.Direction.DESC, "createdAt");
+
+      Pageable pageable = PageRequest.of(pageNum, pageSize, sortOrder);
+      Page<DigitalWork> digitalWorksPage =
+          digitalWorkRepository.findFeedPosts(followingIds, 0, categoryId, filteredTags, pageable)
+              .orElseThrow(() -> new ProductException(Constants.DATA_NOT_FOUND_KEY,
+                  Constants.DIGITAL_WORK_NOT_FOUND_MESSAGE));
+      digitalWorkCacheRepository.save("digital work of " + userId + " "+ page, mapper.toPaginatedDTO(digitalWorksPage));
+
+      return mapper.toPaginatedDTO(digitalWorksPage);
+    }
+    return dto;
   }
 
 
